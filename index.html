@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MoCAP: Mobile Code-As-Policies</title>
+  <meta name="description" content="MoCAP turns passive human video into guidance for zero-shot mobile manipulation: spatial memory for where to search, a human approach prior for how to approach, and a closed-loop code-as-policy agent.">
+  <meta property="og:title" content="MoCAP: Mobile Code-As-Policies for Zero-Shot Mobile Manipulation from Passive Human Videos">
+  <meta property="og:description" content="Passive human video tells a mobile manipulator where to search and from which side to approach.">
+  <meta property="og:image" content="static/images/teaser.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+<!-- ============================== HERO ============================== -->
+<header class="hero">
+  <div class="wrap">
+    <p class="venue">ICRA 2027 &middot; Under review</p>
+    <h1 class="title"><span class="brand">MoCAP</span>: Mobile Code-As-Policies for<br class="br-wide"> Zero-Shot Mobile Manipulation from Passive Human Videos</h1>
+
+    <!-- TODO(authors): fill in after the double-anonymous review period. -->
+    <p class="authors">
+      <span class="author">Anonymous Author(s)</span>
+    </p>
+    <p class="affils">Affiliation withheld for review</p>
+
+    <nav class="links" aria-label="Paper resources">
+      <a class="btn" href="static/MoCAP.pdf" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm7 1.5V9h5.5L13 3.5zM8 13h8v1.6H8V13zm0 3.4h8V18H8v-1.6z"/></svg>
+        Paper</a>
+      <a class="btn is-disabled" aria-disabled="true" title="Coming soon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v2H4V4zm0 4h10v2H4V8zm0 4h16v2H4v-2zm0 4h10v2H4v-2z"/></svg>
+        arXiv <small>soon</small></a>
+      <a class="btn" href="#video">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11a2 2 0 0 1 2 2v2.5l4-2.5v10l-4-2.5V17a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>
+        Video</a>
+      <a class="btn" href="https://github.com/MoCAP-7/MoCAP" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
+        Code</a>
+    </nav>
+
+    <figure class="teaser">
+      <video class="teaser-video" autoplay muted loop playsinline preload="auto"
+             poster="static/images/teaser_poster.jpg">
+        <source src="static/videos/teaser_grasp_can.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <span class="speed">4&times;</span>
+        Earlier, a person went about everyday activities in this office while wearing a camera. Later the robot is asked to
+        <em>&ldquo;Find the purple can and pick it up.&rdquo;</em> It has never seen a demonstration of this task.
+        MoCAP uses that earlier recording to decide where to look and which side to approach from.
+      </figcaption>
+    </figure>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================== TL;DR ============================== -->
+<section class="section">
+  <div class="wrap">
+    <div class="tldr">
+      <article class="pillar c-memory">
+        <span class="num">01</span>
+        <h3>Where to search</h3>
+        <p>An offline builder turns a passive egocentric recording into a <b>reusable spatial memory</b>: places, landmarks, connections, and where small objects sit. The same memory serves every later task.</p>
+      </article>
+      <article class="pillar c-prior">
+        <span class="num">02</span>
+        <h3>How to approach</h3>
+        <p>The frame just before a person reaches for an object shows <b>where they stood</b>. MoCAP recovers that stance and uses it to choose the side of the object the robot approaches from.</p>
+      </article>
+      <article class="pillar c-exec">
+        <span class="num">03</span>
+        <h3>Act under robot constraints</h3>
+        <p>A closed-loop <b>code-as-policy</b> agent writes short Python programs over primitives that check every motion against live geometry, IK and collisions, then revises from feedback.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== ABSTRACT ============================== -->
+<section class="section" id="abstract">
+  <div class="wrap narrow">
+    <h2 class="section-title">Abstract</h2>
+    <p class="abstract">
+      Passive human videos of everyday activity offer robots access to a massive amount of human experience
+      without requiring a demonstration for each task. However, using this experience requires recovering
+      knowledge from unstructured video recordings and adapting it to a different body (i.e., the robot).
+      To overcome these challenges, we present mobile code-as-policy (MoCAP), an agentic framework that turns
+      passive human video recordings into guidance for an end-to-end mobile manipulation policy. MoCAP extracts
+      spatial memory and cues of how people prepare to interact with objects, which inform navigation and the
+      search for a manipulation-ready configuration. Guided by passive human experience and current observations,
+      MoCAP uses a closed-loop code-as-policy to coordinate planning and tool use primitives to solve motions
+      under the robot&rsquo;s geometry and kinematic constraints. On a real mobile manipulator, MoCAP achieves
+      80% success on each of two mobile manipulation tasks in an indoor environment whereas existing approaches
+      cannot succeed at the task. Video-derived spatial memory improves object-navigation success from 70% to
+      100%, and human approach prior raises the rate of finding a reachable base pose from 0% to 100% at an
+      unfavorable start location.
+    </p>
+  </div>
+</section>
+
+<!-- ============================== HEADLINE NUMBERS ============================== -->
+<section class="section tight">
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value">4/5<span class="stat-sep">&nbsp;vs&nbsp;</span><span class="stat-base">0/5</span></div>
+        <div class="stat-label">Mobile grasping (box and can), each task<br><span class="muted">MoCAP vs CaP-X</span></div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">100%<span class="stat-sep">&nbsp;vs&nbsp;</span><span class="stat-base">70%</span></div>
+        <div class="stat-label">Object navigation success<br><span class="muted">with vs without video memory</span></div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">5/5<span class="stat-sep">&nbsp;vs&nbsp;</span><span class="stat-base">0/5</span></div>
+        <div class="stat-label">Reachable base pose from the unfavorable start<br><span class="muted">with vs without human approach prior</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== VIDEO ============================== -->
+<section class="section alt" id="video">
+  <div class="wrap">
+    <h2 class="section-title">Video</h2>
+    <div class="video-frame">
+      <video controls preload="metadata" playsinline poster="static/images/video_poster.jpg">
+        <source src="static/videos/mocap_video.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== METHOD ============================== -->
+<section class="section" id="method">
+  <div class="wrap">
+    <h2 class="section-title">Method</h2>
+    <p class="lede">
+      A recording of everyday activity is processed once, before any task is given. When a request arrives,
+      a startup advisor connects the memory to what the robot currently sees. A code agent then drives the
+      robot through primitives that resolve every motion for the robot&rsquo;s own body.
+    </p>
+    <figure class="figure wide">
+      <img src="static/images/framework.png" alt="MoCAP overview: human video feeds a memory builder that produces spatial memory M=(m,E); a startup advisor relates it to the task and initial view; a code agent emits Python programs that call Navigate, Prepare and Grasp primitives on the robot, and execution feedback closes the loop. Manipulation-ready frames feed pose estimation of the human approach side, which guides docking." loading="lazy">
+      <figcaption>
+        <b>Overview.</b> Passive human video provides a reusable spatial memory and observations of how people prepare
+        to manipulate. The advisor runs once at task startup. During execution the code agent coordinates
+        navigation and manipulation primitives, and the human approach prior guides docking.
+      </figcaption>
+    </figure>
+
+    <div class="tabs" role="tablist" aria-label="Method components">
+      <button class="tab is-active c-memory" role="tab" aria-selected="true" aria-controls="panel-memory" id="tab-memory">1&nbsp;&middot;&nbsp;Spatial memory</button>
+      <button class="tab c-exec" role="tab" aria-selected="false" aria-controls="panel-cap" id="tab-cap">2&nbsp;&middot;&nbsp;Code-as-policy</button>
+      <button class="tab c-prior" role="tab" aria-selected="false" aria-controls="panel-prior" id="tab-prior">3&nbsp;&middot;&nbsp;Human approach prior</button>
+      <button class="tab c-prep" role="tab" aria-selected="false" aria-controls="panel-prep" id="tab-prep">4&nbsp;&middot;&nbsp;Local preparation</button>
+    </div>
+
+    <!-- Panel 1 -->
+    <div class="panel" role="tabpanel" id="panel-memory" aria-labelledby="tab-memory">
+      <div class="split">
+        <div>
+          <h3>Spatial and interaction memory from passive video</h3>
+          <p>An offline builder watches the recording and writes a navigation-oriented text memory <i>m</i> that cites video
+          timestamps, then extracts up to 32 reference frames <i>E</i> at those timestamps. The memory keeps places,
+          connections and landmarks, plus small objects with their support surface and neighbourhood. It also keeps
+          transition cues: where to turn, which landmark should come into view next, and how to recognise a revisited place.
+          Uncertain identities are marked as uncertain.</p>
+          <p>A separate pass finds <b>manipulation events</b>. Low-motion windows are labeled by a VLM with the object, the hand, the last frame before
+          reaching, and first contact. For each event MoCAP saves the <i>ready</i> frame, a view 2&nbsp;s earlier, and the contact frame.</p>
+          <p class="note">None of this processing knows the downstream tasks. The same recording is reused for every request.</p>
+        </div>
+        <figure class="figure">
+          <img src="static/images/human_reach.jpg" alt="Egocentric frame from the passive recording: a person's arm reaches toward a can on a desk." loading="lazy">
+          <figcaption>A frame from the passive recording, near the moment of contact. The <i>ready</i> frame just before it records where the person stood.</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <!-- Panel 2 -->
+    <div class="panel" role="tabpanel" id="panel-cap" aria-labelledby="tab-cap" hidden>
+      <div class="split">
+        <div>
+          <h3>A closed loop of code, execution and observation</h3>
+          <p>At startup the advisor reads the memory, the instruction and the first robot image. It returns the robot&rsquo;s likely location,
+          two to four navigation subgoals with progress cues, and what the target looks like. This runs once per task.</p>
+          <p>The code agent then writes one short program per turn:</p>
+          <p class="eq">c<sub>t</sub> = &pi;(q, a<sub>0</sub>, &otilde;<sub>t</sub>, h<sub>t</sub>),&emsp;(r<sub>t</sub>, o<sub>t+1</sub>) = ExecuteObserve(c<sub>t</sub>)</p>
+          <p>A failed primitive interrupts the rest of the program. Its diagnostics and a fresh observation go back to the agent,
+          which can then change its approach. Primitives cover SAM&nbsp;3 + depth target localisation, Nav2 docking with
+          fresh-perception arrival checks, bounded turns and translations for search and recovery, GraspGen-X grasps, and cuRobo
+          whole-arm planning.</p>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>policy turn &middot; illustrative</span><span class="dot-row"><i></i><i></i><i></i></span></div>
+<pre><code><span class="c"># Target is visible: dock on the side the human prior suggests</span>
+dock = <span class="f">dock_to_visible_object</span>(<span class="s">"can"</span>)
+arm = dock.get(<span class="s">"suggested_arm"</span>, <span class="s">"right"</span>)
+
+<span class="c"># Search nearby base poses for one with a collision-free, IK-feasible grasp</span>
+<span class="f">prepare_for_manipulation</span>(<span class="s">"can"</span>, arm=arm)
+
+position, quat = <span class="f">sample_grasp_pose</span>(<span class="s">"can"</span>, arm=arm)
+<span class="f">open_gripper</span>(arm=arm)
+<span class="f">goto_grasp_pose</span>(<span class="s">"can"</span>, position, quat, arm=arm)
+<span class="f">close_gripper</span>(arm=arm)
+<span class="f">lift_grasped_object</span>(arm=arm)
+<span class="f">finish</span>(<span class="s">"can grasped and held"</span>)</code></pre>
+          <p class="code-foot">If <code>prepare_for_manipulation</code> fails, the remaining calls are skipped and the agent sees why.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 3 -->
+    <div class="panel" role="tabpanel" id="panel-prior" aria-labelledby="tab-prior" hidden>
+      <div class="split">
+        <div>
+          <h3>Where did the person stand?</h3>
+          <p>At docking time, MoCAP retrieves the recorded event for the target. VGGT jointly processes the live robot image and the
+          event&rsquo;s earlier and ready views. It estimates intrinsics and relative poses, so the human camera needs no calibration.
+          Live depth fixes the metric scale. Estimates with an unstable scale or an implausible head height (outside 1.2&ndash;2.1&nbsp;m) are rejected,
+          and the robot falls back to its own arrival direction.</p>
+          <p>The camera centre is projected to the floor, and the stance is placed 0.30&nbsp;m behind it. The bearing from the object to the stance
+          becomes the <b>approach side</b>. Human and robot reach differ, so only the direction transfers. The robot uses its own standoff,
+          and local IK checks decide the final pose. The human&rsquo;s hand breaks ties when MoCAP suggests which arm to use.</p>
+        </div>
+        <figure class="figure diagram">
+          <svg viewBox="0 0 360 250" role="img" aria-labelledby="stance-title">
+            <title id="stance-title">Top view: the human stance behind the estimated camera centre defines the approach bearing from the can; the robot docks at its own standoff along that bearing.</title>
+            <rect x="140" y="40" width="190" height="140" rx="6" class="d-desk"/>
+            <text x="318" y="62" text-anchor="end" class="d-label">Desk</text>
+            <circle cx="165" cy="140" r="8" class="d-can"/>
+            <text x="180" y="145" class="d-label can">Can</text>
+            <line x1="165" y1="140" x2="40" y2="140" class="d-bearing"/>
+            <circle cx="92" cy="140" r="6" class="d-human"/>
+            <text x="92" y="122" text-anchor="middle" class="d-label human">human stance</text>
+            <rect x="40" y="186" width="54" height="38" rx="5" class="d-robot"/>
+            <text x="67" y="210" text-anchor="middle" class="d-label robot">robot</text>
+            <path d="M67 186 L67 162" class="d-arrow"/>
+            <text x="102" y="236" class="d-small">β<tspan baseline-shift="sub" font-size="9">h</tspan> : approach bearing (direction only)</text>
+          </svg>
+          <figcaption>Only the approach direction transfers from the person. The standoff distance and the arm come from the robot.</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <!-- Panel 4 -->
+    <div class="panel" role="tabpanel" id="panel-prep" aria-labelledby="tab-prep" hidden>
+      <div class="split">
+        <div>
+          <h3>Search nearby base poses before moving</h3>
+          <p>Arriving near an object does not mean the arm can reach it. The preparation primitive tests a 7&times;7&times;7 grid of planar
+          adjustments around the current pose: forward &minus;0.10 to 0.20&nbsp;m, lateral &plusmn;0.15&nbsp;m, yaw &plusmn;15&deg;.
+          Every grasp is moved into each candidate frame and screened by gripper swept-volume collision checks and Mink IK. This avoids running a full
+          trajectory plan for every virtual pose.</p>
+          <p>Candidates are ranked lexicographically. Small base motion comes first, then the number of feasible grasps, then robustness to
+          &plusmn;1&nbsp;cm / &plusmn;1&deg; arrival error. The chosen goal is executed, and grasps are re-checked from fresh observations at the
+          pose actually reached. cuRobo then plans the whole-arm motion.</p>
+        </div>
+        <figure class="figure diagram">
+          <svg viewBox="0 0 360 250" role="img" aria-labelledby="grid-title">
+            <title id="grid-title">A grid of candidate base positions around the current pose; the nearest certified pose is highlighted.</title>
+            <g id="prep-grid"></g>
+            <text x="180" y="240" text-anchor="middle" class="d-small">candidate base offsets (forward &times; lateral), yaw not shown</text>
+          </svg>
+          <figcaption><span class="key k-cur"></span>current pose&ensp;<span class="key k-ok"></span>IK-feasible&ensp;<span class="key k-sel"></span>selected (least motion)</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== RESULTS ============================== -->
+<section class="section alt" id="results">
+  <div class="wrap">
+    <h2 class="section-title">Results</h2>
+    <p class="lede">All experiments run on the real YOR robot: an omnidirectional base, a vertical lift, two 7-DoF AgileX Nero arms,
+    and a ZED&nbsp;2i RGB-D camera. The human recording was made with Aria Gen&nbsp;2 glasses, using RGB only. A single memory built from it is shared by every task.</p>
+
+    <!-- ---------- Mobile manipulation ---------- -->
+    <div class="result-block">
+      <h3 class="result-title"><span class="tag c-exec">Q1</span>Complete mobile manipulation</h3>
+      <p>CaP-X is a coding-agent framework for manipulation. We run it through its mobile-manipulator (R1Pro) API, ported to our robot with
+      the same instructions, model and time limit. Its standing poses come from geometric heuristics that assume a simulator will reject collisions.
+      On the real robot, its base goals fell behind or onto the cabinet. In the can task, in-place rotation never brought the can into view: 0 detections in 144 queries.</p>
+
+      <div class="compare">
+        <figure class="clip">
+          <div class="clip-label ours">MoCAP (ours)</div>
+          <video autoplay muted loop playsinline preload="none" poster="static/videos/clips/box_mocap.jpg" data-lazy>
+            <source data-src="static/videos/clips/box_mocap.mp4" type="video/mp4">
+          </video>
+        </figure>
+        <figure class="clip">
+          <div class="clip-label">CaP-X</div>
+          <video autoplay muted loop playsinline preload="none" poster="static/videos/clips/box_capx.jpg" data-lazy>
+            <source data-src="static/videos/clips/box_capx.mp4" type="video/mp4">
+          </video>
+        </figure>
+      </div>
+      <p class="clip-caption">Grasp the cardboard box on the white cabinet, 4&times;. CaP-X was stopped before contact.</p>
+
+      <div class="table-wrap">
+        <table class="results">
+          <caption>Mobile manipulation, five trials per task</caption>
+          <thead><tr><th scope="col">Task</th><th scope="col">Method</th><th scope="col">Successes</th><th scope="col" class="bar-col">Success rate</th></tr></thead>
+          <tbody>
+            <tr class="ours"><th scope="row" rowspan="2">Grasp box</th><td>MoCAP (ours)</td><td>4/5</td><td><div class="bar" style="--v:80" data-tip="MoCAP · grasp box · 4/5"><span>80%</span></div></td></tr>
+            <tr><td>CaP-X</td><td>0/5</td><td><div class="bar" style="--v:0" data-tip="CaP-X · grasp box · 0/5"><span>0%</span></div></td></tr>
+            <tr class="ours group"><th scope="row" rowspan="2">Grasp can</th><td>MoCAP (ours)</td><td>4/5</td><td><div class="bar" style="--v:80" data-tip="MoCAP · grasp can · 4/5"><span>80%</span></div></td></tr>
+            <tr><td>CaP-X</td><td>0/5</td><td><div class="bar" style="--v:0" data-tip="CaP-X · grasp can · 0/5"><span>0%</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ---------- Navigation ---------- -->
+    <div class="result-block">
+      <h3 class="result-title"><span class="tag c-memory">Q2</span>Spatial memory for object navigation</h3>
+      <p>The robot starts in the kitchen with the blue trash bin out of view. An episode succeeds if the base stops within 1&nbsp;m of the bin and the bin is visible.
+      CoW and ApexNav cannot use an offline prior, so the fair comparison for them is MoCAP without the memory. CoW stopped at a white kitchen bin with a blue notice on it.
+      ApexNav either saw the blue bin but kept exploring, or settled on a black shredder.</p>
+
+      <div class="nav-grid">
+        <figure class="clip big">
+          <div class="clip-label ours">MoCAP (ours) &middot; 10/10</div>
+          <video autoplay muted loop playsinline preload="none" poster="static/videos/clips/nav_mocap.jpg" data-lazy>
+            <source data-src="static/videos/clips/nav_mocap.mp4" type="video/mp4">
+          </video>
+        </figure>
+        <figure class="clip pov">
+          <div class="clip-label">Robot camera</div>
+          <video autoplay muted loop playsinline preload="none" poster="static/videos/clips/nav_mocap_pov.jpg" data-lazy>
+            <source data-src="static/videos/clips/nav_mocap_pov.mp4" type="video/mp4">
+          </video>
+        </figure>
+        <figure class="clip small">
+          <div class="clip-label">No prior &middot; 7/10</div>
+          <video autoplay muted loop playsinline preload="none" poster="static/videos/clips/nav_noprior.jpg" data-lazy>
+            <source data-src="static/videos/clips/nav_noprior.mp4" type="video/mp4">
+          </video>
+        </figure>
+        <figure class="clip small">
+          <div class="clip-label">ApexNav &middot; 2/10</div>
+          <video autoplay muted loop playsinline preload="none" poster="static/videos/clips/nav_apexnav.jpg" data-lazy>
+            <source data-src="static/videos/clips/nav_apexnav.mp4" type="video/mp4">
+          </video>
+        </figure>
+        <figure class="clip small">
+          <div class="clip-label">CoW &middot; 0/10</div>
+          <video autoplay muted loop playsinline preload="none" poster="static/videos/clips/nav_cow.jpg" data-lazy>
+            <source data-src="static/videos/clips/nav_cow.mp4" type="video/mp4">
+          </video>
+        </figure>
+      </div>
+      <p class="clip-caption">Navigate to the blue trash bin from the kitchen, 4&times;.</p>
+
+      <div class="table-wrap">
+        <table class="results">
+          <caption>Blue-trash-bin navigation from the kitchen, ten episodes per method</caption>
+          <thead><tr><th scope="col">Method</th><th scope="col" class="bar-col">Success</th><th scope="col" class="bar-col">Within 180&nbsp;s</th><th scope="col" class="bar-col">Within 300&nbsp;s</th></tr></thead>
+          <tbody>
+            <tr class="ours"><th scope="row">MoCAP (ours)</th>
+              <td><div class="bar" style="--v:100" data-tip="MoCAP · success · 10/10"><span>10/10</span></div></td>
+              <td><div class="bar" style="--v:60" data-tip="MoCAP · ≤180 s · 6/10"><span>6/10</span></div></td>
+              <td><div class="bar" style="--v:90" data-tip="MoCAP · ≤300 s · 9/10"><span>9/10</span></div></td></tr>
+            <tr><th scope="row">MoCAP (no prior)</th>
+              <td><div class="bar" style="--v:70" data-tip="No prior · success · 7/10"><span>7/10</span></div></td>
+              <td><div class="bar" style="--v:40" data-tip="No prior · ≤180 s · 4/10"><span>4/10</span></div></td>
+              <td><div class="bar" style="--v:60" data-tip="No prior · ≤300 s · 6/10"><span>6/10</span></div></td></tr>
+            <tr><th scope="row">ApexNav</th>
+              <td><div class="bar" style="--v:20" data-tip="ApexNav · success · 2/10"><span>2/10</span></div></td>
+              <td><div class="bar" style="--v:10" data-tip="ApexNav · ≤180 s · 1/10"><span>1/10</span></div></td>
+              <td><div class="bar" style="--v:20" data-tip="ApexNav · ≤300 s · 2/10"><span>2/10</span></div></td></tr>
+            <tr><th scope="row">CoW</th>
+              <td><div class="bar" style="--v:0" data-tip="CoW · success · 0/10"><span>0/10</span></div></td>
+              <td><div class="bar" style="--v:0" data-tip="CoW · ≤180 s · 0/10"><span>0/10</span></div></td>
+              <td><div class="bar" style="--v:0" data-tip="CoW · ≤300 s · 0/10"><span>0/10</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ---------- Approach prior ---------- -->
+    <div class="result-block">
+      <h3 class="result-title"><span class="tag c-prior">Q3</span>Human approach prior for base placement</h3>
+      <p>The robot starts from A, B or C around a desk. The recorded human interaction happened on the C side. Each trial runs docking and then local
+      preparation without the code agent, so there is no chance to retry from another side. The two conditions differ only in the approach
+      direction given to docking. Success means at least one grasp passes collision and IK checks from some nearby base pose.</p>
+
+      <div class="prior-layout">
+        <figure class="figure diagram start-map">
+          <svg viewBox="0 0 300 230" role="img" aria-labelledby="abc-title">
+            <title id="abc-title">Start positions around a desk, matching the paper's Fig. 5: A above the desk, B at its upper left, and C on the left at the can's height (the human side). The can sits near the desk's lower-left corner.</title>
+            <rect x="103" y="73" width="171" height="127" rx="6" class="d-desk"/>
+            <text x="262" y="95" text-anchor="end" class="d-label">Desk</text>
+            <circle cx="128" cy="166" r="7" class="d-can"/>
+            <text x="141" y="171" class="d-label can">Can</text>
+            <g class="start" data-start="A"><rect x="112" y="12" width="46" height="30" rx="5"/><text x="135" y="32" text-anchor="middle">A</text></g>
+            <g class="start" data-start="B"><rect x="24" y="61" width="46" height="30" rx="5"/><text x="47" y="81" text-anchor="middle">B</text></g>
+            <g class="start human" data-start="C"><rect x="24" y="151" width="46" height="30" rx="5"/><text x="47" y="171" text-anchor="middle">C</text></g>
+            <text x="47" y="198" text-anchor="middle" class="d-small human">human side</text>
+            <line x1="134" y1="42" x2="129" y2="157" class="d-look"/>
+            <line x1="70" y1="86" x2="122" y2="159" class="d-look"/>
+            <line x1="70" y1="166" x2="119" y2="166" class="d-look"/>
+          </svg>
+          <figcaption>Start A is where the two approach directions disagree most.</figcaption>
+        </figure>
+
+        <div class="table-wrap">
+          <table class="results prior-table">
+            <caption>Manipulation readiness, five trials per start and condition</caption>
+            <thead><tr><th scope="col">Start</th><th scope="col" class="bar-col">Without prior</th><th scope="col" class="bar-col">With prior</th></tr></thead>
+            <tbody>
+              <tr data-row="A"><th scope="row">A</th>
+                <td><div class="bar base" style="--v:0" data-tip="A · without prior · 0/5"><span>0/5</span></div></td>
+                <td class="ours"><div class="bar" style="--v:100" data-tip="A · with prior · 5/5"><span>5/5</span></div></td></tr>
+              <tr data-row="B"><th scope="row">B</th>
+                <td><div class="bar base" style="--v:40" data-tip="B · without prior · 2/5"><span>2/5</span></div></td>
+                <td class="ours"><div class="bar" style="--v:60" data-tip="B · with prior · 3/5"><span>3/5</span></div></td></tr>
+              <tr data-row="C"><th scope="row">C</th>
+                <td><div class="bar base" style="--v:80" data-tip="C · without prior · 4/5"><span>4/5</span></div></td>
+                <td class="ours"><div class="bar" style="--v:60" data-tip="C · with prior · 3/5"><span>3/5</span></div></td></tr>
+              <tr class="total"><th scope="row">All</th>
+                <td><div class="bar base" style="--v:40" data-tip="All · without prior · 6/15"><span>6/15</span></div></td>
+                <td class="ours"><div class="bar" style="--v:73.3" data-tip="All · with prior · 11/15"><span>11/15</span></div></td></tr>
+            </tbody>
+          </table>
+          <p class="note">From C the robot&rsquo;s own arrival direction already matches the human stance, so the prior adds nothing there.
+          The pooled difference is not statistically significant at this sample size. The effect to look at is start A.</p>
+        </div>
+      </div>
+
+      <div class="compare">
+        <figure class="clip">
+          <div class="clip-label">Without prior &middot; start A</div>
+          <video autoplay muted loop playsinline preload="none" poster="static/videos/clips/prior_without.jpg" data-lazy>
+            <source data-src="static/videos/clips/prior_without.mp4" type="video/mp4">
+          </video>
+        </figure>
+        <figure class="clip">
+          <div class="clip-label ours">With human prior &middot; start A</div>
+          <video autoplay muted loop playsinline preload="none" poster="static/videos/clips/prior_with.jpg" data-lazy>
+            <source data-src="static/videos/clips/prior_with.mp4" type="video/mp4">
+          </video>
+        </figure>
+      </div>
+      <p class="clip-caption">Same start, same docking and local search, 4&times;. Without the prior, no IK-feasible base pose is found. With it, the robot docks on the human side and finds one.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== ROLLOUTS ============================== -->
+<section class="section" id="rollouts">
+  <div class="wrap">
+    <h2 class="section-title">Example executions</h2>
+    <p class="lede">Each row shows keyframes from one continuous run, left to right.</p>
+    <div class="seq-tabs" role="tablist" aria-label="Task">
+      <button class="seq-tab is-active" role="tab" aria-selected="true" data-seq="can">Grasp can</button>
+      <button class="seq-tab" role="tab" aria-selected="false" data-seq="box">Grasp cardboard box</button>
+      <button class="seq-tab" role="tab" aria-selected="false" data-seq="nav">Navigate to trash bin</button>
+    </div>
+    <figure class="figure seq" data-seq-panel="can">
+      <img src="static/images/seq_grasp_can.jpg" alt="Grasp can: navigate to table, prepare, grasp can, can secured." loading="lazy">
+    </figure>
+    <figure class="figure seq" data-seq-panel="box" hidden>
+      <img src="static/images/seq_grasp_box.jpg" alt="Grasp cardboard box: approach cabinet, prepare, grasp, box secured." loading="lazy">
+    </figure>
+    <figure class="figure seq" data-seq-panel="nav" hidden>
+      <img src="static/images/seq_navigate_trash_bin.jpg" alt="Navigate to trash bin: start in kitchen, pass the seating area, approach and arrive at the trash bin." loading="lazy">
+    </figure>
+  </div>
+</section>
+
+<!-- ============================== PLATFORM + LIMITATIONS ============================== -->
+<section class="section alt">
+  <div class="wrap">
+    <div class="split">
+      <figure class="figure platform">
+        <img src="static/images/platform.jpg" alt="The YOR robot: RGB-D camera, 7-DoF dual arms, grippers, vertical lift and omnidirectional base." loading="lazy">
+      </figure>
+      <div>
+        <h2 class="section-title left">Platform</h2>
+        <p>The experiments use <a href="https://arxiv.org/abs/2602.11150" target="_blank" rel="noopener">YOR</a>, a low-cost open mobile manipulator.
+        A Jetson Orin NX runs the agent runtime and the perception and planning services. Raspberry Pi services control the base and arms.
+        The code agent and the offline memory builder both use GPT-5.6.</p>
+        <h2 class="section-title left">Limitations</h2>
+        <p>The evaluation covers one environment, one recording and three target objects, with five to ten trials per condition. It shows that the
+        approach is feasible, but it does not show that it generalises. It is still open whether the memory and approach priors transfer across rooms, recorders, and objects
+        that never appear in the recording. Manipulation in this work is limited to grasping and lifting.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== BIBTEX ============================== -->
+<section class="section" id="bibtex">
+  <div class="wrap narrow">
+    <h2 class="section-title">BibTeX</h2>
+    <div class="bib">
+      <button class="copy" type="button" aria-label="Copy BibTeX">Copy</button>
+<pre id="bibtex-text">@article{mocap2027,
+  title   = {MoCAP: Mobile Code-As-Policies for Zero-Shot Mobile
+             Manipulation from Passive Human Videos},
+  author  = {Anonymous},
+  journal = {arXiv preprint},
+  year    = {2026}
+}</pre>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <p>Page layout adapted from the <a href="https://github.com/nerfies/nerfies.github.io" target="_blank" rel="noopener">Nerfies</a> project page template,
+    licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>.</p>
+  </div>
+</footer>
+
+<div class="tip" role="tooltip" hidden></div>
+<script src="static/js/main.js"></script>
+</body>
+</html>
