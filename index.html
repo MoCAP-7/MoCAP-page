@@ -112,7 +112,7 @@
     <div class="stats">
       <div class="stat">
         <div class="stat-value">4/5<span class="stat-sep">&nbsp;vs&nbsp;</span><span class="stat-base">0/5</span></div>
-        <div class="stat-label">Mobile grasping (box and can), each task<br><span class="muted">MoCAP vs CaP-X</span></div>
+        <div class="stat-label">2 mobile manipulation tasks, each task<br><span class="muted">MoCAP vs CaP-X</span></div>
       </div>
       <div class="stat">
         <div class="stat-value">100%<span class="stat-sep">&nbsp;vs&nbsp;</span><span class="stat-base">70%</span></div>
@@ -120,7 +120,7 @@
       </div>
       <div class="stat">
         <div class="stat-value">14/15<span class="stat-sep">&nbsp;vs&nbsp;</span><span class="stat-base">0/15</span></div>
-        <div class="stat-label">Manipulation readiness from start A<br><span class="muted">with vs without human approach prior</span></div>
+        <div class="stat-label">Manipulation readiness from an unfavorable start<br><span class="muted">with vs without human approach prior</span></div>
       </div>
     </div>
   </div>
@@ -197,7 +197,7 @@ position, quat = <span class="f c-exec">sample_grasp_pose</span>(<span class="s"
     <!-- ---------- Mobile manipulation ---------- -->
     <div class="result-block c-exec">
       <h3 class="result-title"><span class="tag c-exec">Q1</span>Complete mobile manipulation</h3>
-      <p>The box task starts with the target in view; the can is outside the robot&rsquo;s initial view.
+      <p>The box task starts with the target in view. The can is outside the robot&rsquo;s initial view.
       Success requires grasping the requested object and keeping it securely held. We compare against CaP-X through its mobile-manipulator API,
       ported to our robot with the same task instructions, policy model, time limit, and program budget.</p>
 
@@ -235,7 +235,7 @@ position, quat = <span class="f c-exec">sample_grasp_pose</span>(<span class="s"
     <div class="result-block c-memory">
       <h3 class="result-title"><span class="tag c-memory">Q2</span>Spatial memory for object navigation</h3>
       <p>The robot navigates to a blue trash bin from the kitchen. An episode succeeds if the base stops within 1&nbsp;m of the bin
-      and the bin is visibly identified in the terminal robot view. CoW and ApexNav cannot consume an offline prior; they are compared against
+      and the bin is visibly identified in the terminal robot view. CoW and ApexNav cannot consume an offline prior. They are compared against
       the no-prior variant. The comparison with full MoCAP measures the effect of spatial memory.</p>
 
       <div class="nav-grid">
@@ -301,7 +301,7 @@ position, quat = <span class="f c-exec">sample_grasp_pose</span>(<span class="s"
     <!-- ---------- Approach prior ---------- -->
     <div class="result-block c-prep">
       <h3 class="result-title"><span class="tag c-prep">Q3</span>Human approach prior for base placement</h3>
-      <p>The robot starts from A, B, or C; the recorded human interaction occurs on the C side. Each trial runs docking followed by local
+      <p>The robot starts from A, B, or C. The recorded human interaction occurs on the C side. Each trial runs docking followed by local
       preparation without the code agent. Only the approach direction supplied to docking changes. Readiness means that at least one proposed grasp
       passes gripper collision checks and nominal IK from a base pose.</p>
 
@@ -363,7 +363,7 @@ position, quat = <span class="f c-exec">sample_grasp_pose</span>(<span class="s"
           </video>
         </figure>
       </div>
-      <p class="clip-caption">Example trials from start A, 4&times;. Both conditions share the same perception, docking primitive, local search, and grasp planner; only the approach direction changes.</p>
+      <p class="clip-caption">Example trials from start A, 4&times;. Both conditions share the same perception, docking primitive, local search, and grasp planner. Only the approach direction changes.</p>
     </div>
   </div>
 </section>
