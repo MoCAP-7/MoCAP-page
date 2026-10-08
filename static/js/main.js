@@ -32,19 +32,6 @@
     });
   }
 
-  /* ---------- A/B/C map <-> readiness table linking ---------- */
-  const starts = Array.from(document.querySelectorAll(".start"));
-  const rows = Array.from(document.querySelectorAll(".prior-table tr[data-row]"));
-  function hot(key) {
-    starts.forEach((s) => s.classList.toggle("is-hot", s.dataset.start === key));
-    rows.forEach((r) => r.classList.toggle("is-hot", r.dataset.row === key));
-  }
-  starts.concat(rows).forEach((el) => {
-    const key = el.dataset.start || el.dataset.row;
-    el.addEventListener("mouseenter", () => hot(key));
-    el.addEventListener("mouseleave", () => hot(null));
-  });
-
   /* ---------- copy BibTeX ---------- */
   const copy = document.querySelector(".copy");
   if (copy) {
