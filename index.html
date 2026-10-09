@@ -128,6 +128,13 @@ position, quat = <span class="f c-exec">sample_grasp_pose</span>(<span class="s"
 <span class="f c-exec">lift_grasped_object</span>(arm=arm)
 <span class="f c-exec">finish</span>(<span class="s">"can grasped and held"</span>)</code></pre>
         </div>
+      <figure class="figure navigation-example">
+        <p class="navigation-call"><code>dock_to_visible_object("can")</code></p>
+        <video autoplay muted loop playsinline controls preload="none" poster="static/images/nav2_visualized.jpg" data-lazy aria-label="Navigation tool example with live costmap and planned path">
+          <source data-src="static/videos/nav2_visualized.mp4" type="video/mp4">
+        </video>
+        <figcaption>The agent specifies a navigation target in natural language, rather than repeatedly sending low-level movement commands. The tool handles collision-aware planning and base control through a classical navigation stack. The top-right panel shows the live costmap and planned path.</figcaption>
+      </figure>
     </div>
   </div>
 </section>

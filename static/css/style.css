@@ -126,6 +126,12 @@ b { font-weight: 600; }
 .human-video video { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #171c20; }
 .btn:focus-visible, .copy:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
+/* Supplementary navigation example within Code-as-Policy. */
+.navigation-example { grid-column: 1 / -1; width: 100%; max-width: 760px; margin: 8px auto 0; }
+.navigation-call { margin: 0 0 10px; color: var(--memory); font-family: var(--mono); font-size: 16px; }
+.navigation-call code { font: inherit; }
+.navigation-example video { width: 100%; height: auto; border-radius: 4px; background: #171c20; }
+
 /* code card */
 .code-card { border-radius: 10px; overflow: hidden; background: #0f1720; box-shadow: var(--shadow); }
 .code-head {
