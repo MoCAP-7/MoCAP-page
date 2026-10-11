@@ -1,5 +1,3 @@
-# MoCAP project page
+# MoCaP project page
 
 Static website. No build step required.
-
-

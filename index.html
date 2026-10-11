@@ -3,16 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MoCAP: Mobile Code-As-Policies</title>
-  <meta name="description" content="MoCAP turns passive human video into guidance for zero-shot mobile manipulation: spatial memory for where to search, a human approach prior for how to approach, and a closed-loop code-as-policy agent.">
-  <meta property="og:title" content="MoCAP: Mobile Code-As-Policies for Zero-Shot Mobile Manipulation from Passive Human Videos">
+  <title>MoCaP: Mobile Code-as-Policies</title>
+  <meta name="description" content="MoCaP turns passive human video into guidance for zero-shot mobile manipulation: spatial memory for where to search, a human approach prior for how to approach, and a closed-loop code-as-policy agent.">
+  <meta property="og:title" content="MoCaP: Mobile Code-as-Policies for Zero-Shot Mobile Manipulation from Passive Human Videos">
   <meta property="og:description" content="Passive human video tells a mobile manipulator where to search and from which side to approach.">
   <meta property="og:image" content="static/images/teaser.jpg">
   <meta name="twitter:card" content="summary_large_image">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
@@ -20,7 +17,7 @@
 <!-- ============================== HERO ============================== -->
 <header class="hero">
   <div class="wrap">
-    <h1 class="title"><span class="brand">MoCAP</span>: Mobile Code-As-Policies for<br class="br-wide"> Zero-Shot Mobile Manipulation from Passive Human Videos</h1>
+    <h1 class="title"><span class="brand">MoCaP</span>: Mobile Code-as-Policies for<br class="br-wide"> Zero-Shot Mobile Manipulation from Passive Human Videos</h1>
 
     <!-- TODO(authors): fill in after the double-anonymous review period. -->
     <p class="authors">
@@ -44,16 +41,13 @@
     </nav>
 
     <figure class="teaser">
-      <video class="teaser-video" autoplay muted loop playsinline preload="auto"
-             poster="static/images/teaser_poster.jpg">
-        <source src="static/videos/teaser_grasp_can.mp4" type="video/mp4">
-      </video>
+      <img class="teaser-image" src="static/images/teaser.jpg" width="2030" height="1298"
+           alt="MoCaP extracts spatial memory and an approach direction from passive human videos. A coding agent uses these priors for navigation and manipulation. Blue denotes navigation and spatial memory. Orange denotes manipulation and approach direction.">
       <figcaption>
-        <span class="speed">4&times;</span>
-        Earlier, a person recorded everyday activities and interactions with objects in this office using a wearable camera. Later the robot is asked to
-        <em>&ldquo;Find the purple can and pick it up.&rdquo;</em>
-        MoCAP uses that earlier recording to decide where to look and which side to approach from,
-        helping the robot complete mobile manipulation tasks by guiding both object search and the approach to manipulation.
+        MoCaP turns passive human video into guidance for real-world mobile manipulation.
+        From videos recorded during daily life, MoCaP extracts a spatial memory and an approach direction.
+        A coding agent uses them to find the target and reach a base pose with a feasible grasp.
+        Grey dashed paths show execution without this prior.
       </figcaption>
     </figure>
   </div>
@@ -66,7 +60,7 @@
   <div class="wrap narrow">
     <h2 class="section-title">Abstract</h2>
     <p class="abstract">
-      Passive human videos of everyday activity offer robots access to a massive amount of human experience without requiring a demonstration for each task. However, using this experience requires recovering knowledge from unstructured video recordings and adapting it to a different body (i.e., the robot). To overcome these challenges, we present mobile code-as-policy (MoCAP), an agentic framework that turns passive human video recordings into guidance for an end-to-end mobile manipulation policy. MoCAP extracts spatial memory and cues of how people prepare to interact with objects, which inform navigation and the search for a manipulation-ready configuration. Guided by passive human experience and current observations, MoCAP uses a closed-loop code-as-policy to coordinate planning and tool use primitives to solve motions under the robot’s geometry and kinematic constraints. On a real mobile manipulator, MoCAP achieves 80% success on each of two mobile manipulation tasks in an indoor environment whereas existing approaches cannot succeed at the task. Video-derived spatial memory improves object-navigation success from 70% to 100%, and human approach prior raises the rate of finding a reachable base pose from 0% to 100% at an unfavorable start location.
+      Passive human videos of everyday activity offer robots access to a massive amount of human experience without requiring a demonstration for each task. However, using this experience requires recovering knowledge from unstructured video recordings and adapting it to a different body (i.e., the robot). To overcome these challenges, we present mobile code-as-policy (MoCaP), an agentic framework that turns passive human video recordings into guidance for an end-to-end mobile manipulation policy. MoCaP extracts spatial memory and cues of how people prepare to interact with objects, which inform navigation and the search for a manipulation-ready configuration. Guided by passive human experience and current observations, MoCaP uses a closed-loop code-as-policy to coordinate planning and tool use primitives to solve motions under the robot’s geometry and kinematic constraints. On a real mobile manipulator, MoCaP achieves 80% success on each of two mobile manipulation tasks in an indoor environment whereas existing approaches cannot succeed at the task. Video-derived spatial memory improves object-navigation success from 70% to 100%, and human approach prior raises the rate of finding a reachable base pose from 0% to 100% at an unfavorable start location.
     </p>
   </div>
 </section>
@@ -86,7 +80,7 @@
 <!-- ============================== METHOD ============================== -->
 <section class="section" id="method">
   <div class="wrap">
-    <h2 class="section-title">How MoCAP Uses Human Video</h2>
+    <h2 class="section-title">How MoCaP Uses Human Video</h2>
     <p class="lede">Spatial memory guides where to search, and the human approach prior guides base placement for manipulation.
     The code agent integrates this guidance with live observations and execution feedback, while robot-specific checks and planning determine the motions to execute.</p>
 
@@ -102,7 +96,7 @@
         <h4 class="c-memory">Spatial memory for object search</h4>
         <p>An offline builder organizes the recording into text and timestamped reference frames. At task startup, an advisor relates this memory to the instruction and initial robot view.</p>
         <h4 class="c-prep">Human approach prior for base placement</h4>
-        <p>Recorded interactions retain the view preceding the reach. MoCAP estimates where the person stood relative to the target and uses that direction to guide the robot&rsquo;s approach. The robot chooses its own distance from the object and checks whether its arm can reach a grasp.</p>
+        <p>Recorded interactions retain the view preceding the reach. MoCaP estimates where the person stood relative to the target and uses that direction to guide the robot&rsquo;s approach. The robot chooses its own distance from the object and checks whether its arm can reach a grasp.</p>
       </div>
     </div>
 
@@ -110,7 +104,6 @@
       <div class="method-copy">
         <h3>Closed-loop Code-as-Policy</h3>
         <p>A coding agent generates short Python programs that call the robot&rsquo;s navigation and manipulation tools. Execution feedback and a fresh observation inform the next code-generation step.</p>
-        <p>The human prior guides which side of the object the robot approaches. Before moving, the robot checks nearby positions to find one where its arm can reach a grasp and the gripper can approach without colliding with observed obstacles. After moving, it checks again using a fresh view, then plans the arm&rsquo;s motion.</p>
       </div>
       <div class="code-card">
           <div class="code-head"><span>policy turn &middot; illustrative</span><span class="dot-row"><i></i><i></i><i></i></span></div>
@@ -142,7 +135,7 @@ position, quat = <span class="f c-exec">sample_grasp_pose</span>(<span class="s"
 <!-- ============================== RESULTS ============================== -->
 <section class="section alt" id="results">
   <div class="wrap">
-    <h2 class="section-title">MoCAP in Action</h2>
+    <h2 class="section-title">MoCaP in Action</h2>
     <p class="lede">All experiments run on the real YOR robot: an omnidirectional base, a vertical lift, two 7-DoF AgileX Nero arms,
     and a ZED&nbsp;2i RGB-D camera. The human recording was made with Aria Gen&nbsp;2 glasses, using RGB only. A single memory built from it is shared by every task.</p>
 
@@ -155,7 +148,7 @@ position, quat = <span class="f c-exec">sample_grasp_pose</span>(<span class="s"
 
       <div class="compare">
         <figure class="clip">
-          <div class="clip-label ours">MoCAP (ours)</div>
+          <div class="clip-label ours">MoCaP (ours)</div>
           <video autoplay muted loop playsinline preload="none" poster="static/videos/clips/box_mocap.jpg" data-lazy>
             <source data-src="static/videos/clips/box_mocap.mp4" type="video/mp4">
           </video>
@@ -176,11 +169,11 @@ position, quat = <span class="f c-exec">sample_grasp_pose</span>(<span class="s"
       <h3 class="result-title"><span class="tag">02</span>Spatial memory for object navigation</h3>
       <p>The robot navigates to a blue trash bin from the kitchen. An episode succeeds if the base stops within 1&nbsp;m of the bin
       and the bin is visibly identified in the terminal robot view. CoW and ApexNav cannot consume an offline prior. They are compared against
-      the no-prior variant. The comparison with full MoCAP measures the effect of spatial memory.</p>
+      the no-prior variant. The comparison with full MoCaP measures the effect of spatial memory.</p>
 
       <div class="nav-grid">
         <figure class="clip big">
-          <div class="clip-label ours">MoCAP (ours)</div>
+          <div class="clip-label ours">MoCaP (ours)</div>
           <video autoplay muted loop playsinline preload="none" poster="static/videos/clips/nav_mocap.jpg" data-lazy>
             <source data-src="static/videos/clips/nav_mocap.mp4" type="video/mp4">
           </video>
