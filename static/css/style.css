@@ -34,6 +34,7 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
+  zoom: 0.9;
   margin: 0;
   font-family: var(--font);
   font-size: 17px;
