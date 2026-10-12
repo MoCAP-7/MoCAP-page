@@ -191,6 +191,14 @@ b { font-weight: 600; }
   background: rgba(20, 26, 34, .72); color: #fff; backdrop-filter: blur(4px);
 }
 .clip-label.ours { background: var(--accent); }
+.clip video[tabindex] { cursor: pointer; }
+.clip video:focus { outline: none; }
+.clip video:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+.clip.is-paused::after {
+  content: "❚❚ paused"; position: absolute; top: 10px; right: 10px; z-index: 1; pointer-events: none;
+  padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;
+  background: rgba(20, 26, 34, .72); color: #fff;
+}
 .clip-caption { margin: 10px 0 22px; font-size: 14.5px; color: var(--ink-3); }
 
 .nav-grid {
