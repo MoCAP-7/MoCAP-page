@@ -77,7 +77,7 @@ b { font-weight: 600; }
 .btn small { font-weight: 500; opacity: .85; }
 
 .teaser { margin: 0; }
-.teaser-image { width: 100%; height: auto; background: #fff; }
+.teaser-image { display: block; width: 100%; max-width: 760px; height: auto; margin: 0 auto; background: #fff; }
 .teaser figcaption {
   max-width: 820px; margin: 16px auto 0; color: var(--ink-2); font-size: 16px; text-align: center;
 }
